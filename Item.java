@@ -5,14 +5,16 @@ public class Item {
 	private double price;
 	private String category;
 	private String id;
+	private int cookTimeMS;
 	
-	public Item(String itemName, String description, double price, String category, String id) {
+	public Item(String itemName, String description, double price, String category, String id,int cookTimeMS) {
 		super();
 		this.itemName = itemName;
 		this.description = description;
 		this.price = price;
 		this.category = category;
 		this.id = id;
+		this.cookTimeMS=cookTimeMS;
 	}
 	
 	public String getItemName() {
@@ -44,6 +46,12 @@ public class Item {
 	}
 	public void setId(String id) {
 		this.id = id;
+	}
+	public int getCookTimeMS() {
+		return cookTimeMS;
+	}
+	public void setCookTimeMS(int cookTimeMS) {
+		this.cookTimeMS = cookTimeMS;
 	}
 
 

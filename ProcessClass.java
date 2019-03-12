@@ -23,6 +23,13 @@ public class ProcessClass {
 	public HashMap<String,Item> itemlist = new HashMap<String,Item>();
 	public HashMap<String,Report> reportlist = new HashMap<String,Report>();
 	public LinkedList<Order> orderlist = new LinkedList<Order>();
+    public LinkedList<Order> currentQueueOrder = new LinkedList<Order>();
+	
+	public Waiter waiter1=new Waiter("Waiter Sam",currentQueueOrder);
+    public Waiter waiter2=new Waiter("Waiter John",currentQueueOrder);
+    
+    public Thread t1=new Thread(waiter1);
+    public Thread t2=new Thread(waiter2);
 	
 	//This method will return the LinkedList of Orders
 	public LinkedList<Order> getOrderList(){
@@ -57,6 +64,7 @@ public class ProcessClass {
 					double price = Double.parseDouble(parts[2]);
 					String category = parts[3];
 					String id = parts[4];
+					int milliSec = Integer.parseInt(parts[5]);
 					try {
 						String pattern = "BIT|HOT|SHK|CCD\\d{3}";
 						Pattern pat = Pattern.compile(pattern);
@@ -64,7 +72,7 @@ public class ProcessClass {
 						if(!m.find()){
 							throw new PatternException("Incorrect Id: " + id +" in Items.csv. The item Id should have the following pattern:<BIT/HOT/SHK/CCD><3-digit number> eg:BIT123, HOT123, SHK123, CCD123");
 						}
-						Item item = new Item(name,desc,price,category,id);
+						Item item = new Item(name,desc,price,category,id,millisec);
 						itemlist.put(id, item);
 					}
 					catch(PatternException pe) {
@@ -122,6 +130,7 @@ public class ProcessClass {
 					try {
 					Order order = new Order(ts,id,itemid,quantity,amount);
 					orderlist.add(order);
+					currentQueueOrder.add(order);
 					}
 					catch(PatternException pe) {
 					   JOptionPane.showMessageDialog(null, pe.getMessage());
@@ -150,6 +159,7 @@ public class ProcessClass {
 	//This method appends new orders with existing orders
 	public void addOrder(LinkedList<Order> list) {
 		orderlist.addAll(list);
+		currentQueueOrder.addAll(list);
 		for (Order o:orderlist)
 		{
 		System.out.println(o.getAmount());
@@ -159,6 +169,21 @@ public class ProcessClass {
 		
 	}
 	
+	public void startService()
+	{
+		if(!t1.isAlive())
+		{
+		
+	    try{t1.start();}catch(IllegalThreadStateException e) {Thread t1=new Thread(waiter1);t1.start();}
+		}
+		if(!t2.isAlive())
+		{	
+			
+		try{t2.start();}catch(IllegalThreadStateException e) {Thread t2=new Thread(waiter2);t2.start();}
+		}
+    
+	}
+		
 	
 	//Reference-http://resources.mpi-inf.mpg.de/d5/teaching/ss05/is05/javadoc/java/util/HashMap.Entry.html
 	// Get the list of items in a particular Category
@@ -213,7 +238,6 @@ public class ProcessClass {
 					String id = r.getValue().getId();
 					String name = r.getValue().getItemName();
 					int quantity = r.getValue().getQuantity()+o.getQuantity();
-					//double uprice = getUnitPriceByItemName(r.getValue().getItemName());
 					double total = r.getValue().getTotal() + o.getAmount();
 					r.setValue(new Report(id,name,quantity,total));
 				}
@@ -223,9 +247,10 @@ public class ProcessClass {
 	}
 	//This method generates the final report
 	public String generateReport() {
-		double amount = 0.0;
+		double amount=0.0;
 		String report="";
-		report += "Id     Item Name      Quantity    Total\r\n";
+		report += "Id     ItemName       Quantity   Total\r\n";
+		report += "\r\n";
 		for(Map.Entry<String, Report> r: reportlist.entrySet()) {
 			report += String.format("%-7s",r.getValue().getId());
 			report += String.format("%-20s",r.getValue().getItemName());
@@ -233,9 +258,11 @@ public class ProcessClass {
 			report += String.format("%-7s", r.getValue().getTotal());
 			report += "\r\n";
 			amount=amount+r.getValue().getTotal();
-			
 		}
-		report+="\n\n\n\t\t\t\t\t\tTotal: "+amount;
+		report += "\r\n";
+		report+="\t\t\tGrossTotal: "+amount;
+		report+="\r\n\t\t\tTotalDiscountToday: "+Discount.totalDiscount;
+		report+="\r\n\t\t\tNetTotal: "+(amount-Discount.totalDiscount);
 		return report;
 	}
 	

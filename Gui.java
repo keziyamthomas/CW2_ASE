@@ -33,7 +33,9 @@ public class Gui extends javax.swing.JFrame {
         
         //Load the unprocessed 
         processClass.readOrder();		
-        orderList = new LinkedList<Order>();
+        
+      //Start servicing the orders
+        processClass.startService();
     }
 
     /**
@@ -199,7 +201,7 @@ public class Gui extends javax.swing.JFrame {
             }
         });
 
-        itemsCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        itemsCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] {"--Select a category--"}));
         itemsCombo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 itemsComboActionPerformed(evt);
@@ -391,6 +393,8 @@ public class Gui extends javax.swing.JFrame {
 
     private void addBtn1ActionPerformed(java.awt.event.ActionEvent evt) { 
     	int x;
+    	totalLabel.setText(null);
+        discountAmtLabel.setText(null);
     	try {
     		x = Integer.parseInt((String) quantityTextbox.getText());
     	}
@@ -434,19 +438,22 @@ public class Gui extends javax.swing.JFrame {
         */
         int total = 0, quantity = 0 ;
         double unitPrice = 0;
+        double discountAmt=0;
         Discount discount = new Discount();
-                
+        orderList = new LinkedList<Order>();
+        
         for (int i = 0; i < orderTable.getRowCount(); i++){
             quantity = Integer.parseInt((String) orderTable.getValueAt(i, 3));
             unitPrice = Double.parseDouble((String) orderTable.getValueAt(i, 2));
             total += quantity * unitPrice;
         }
         
-        double discountAmt = discount.calculateDiscount((double)total,orderList);
+        orderList=getCurrentOrderList();
+        discountAmt = discount.calculateDiscount((double)total,orderList);
         totalLabel.setText(Double.toString((double)total - discountAmt));
         discountAmtLabel.setText(Double.toString(discountAmt));
-        
-        processClass.addOrder(getCurrentOrderList((double)total - discountAmt));
+        processClass.addOrder(orderList);
+        processClass.startService();
         
     }                                        
 
@@ -528,15 +535,15 @@ public class Gui extends javax.swing.JFrame {
         
     }
     
-    public LinkedList<Order> getCurrentOrderList(double amt)
+    public LinkedList<Order> getCurrentOrderList()
     {
         // Iterate through the table and add return the full order as list
     	for (int row=0; row < orderTable.getRowCount(); row++) {
     		Timestamp time = new Timestamp(System.currentTimeMillis());
     		String custId = processClass.generateOrderId();
-    		String item = orderTable.getValueAt(row, 1).toString();
-    		int quantity = Integer.parseInt(orderTable.getValueAt(row, 3).toString()); 
-    		double amount = amt;
+    		String item = processClass.getItemIdByItemName(orderTable.getValueAt(row, 1).toString());
+    		int quantity = Integer.parseInt((String) orderTable.getValueAt(row, 3));
+    		double amount = Double.parseDouble((String) orderTable.getValueAt(row, 2))*quantity;
     		saveOrderToList(time,custId,item,quantity,amount);
     	}
     	return orderList;
