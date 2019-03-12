@@ -57,21 +57,21 @@ public class ProcessClass {
 					double price = Double.parseDouble(parts[2]);
 					String category = parts[3];
 					String id = parts[4];
-					
-					String pattern = "BIT|HOT|SHK|CCD\\d{3}";
-					Pattern pat = Pattern.compile(pattern);
-					Matcher m = pat.matcher(id);
-					if(!m.find()){
-						throw new PatternException("Incorrect Id: " + id +" in Items.csv. The item Id should have the following pattern:<BIT/HOT/SHK/CCD><3-digit number> eg:BIT123, HOT123, SHK123, CCD123");
-					}
-					Item item = new Item(name,desc,price,category,id);
-					itemlist.put(id, item);
-					
-					Report rpt = new Report(id,name,0,0.0);
-					reportlist.put(id,rpt);
+					try {
+						String pattern = "BIT|HOT|SHK|CCD\\d{3}";
+						Pattern pat = Pattern.compile(pattern);
+						Matcher m = pat.matcher(id);
+						if(!m.find()){
+							throw new PatternException("Incorrect Id: " + id +" in Items.csv. The item Id should have the following pattern:<BIT/HOT/SHK/CCD><3-digit number> eg:BIT123, HOT123, SHK123, CCD123");
+						}
+						Item item = new Item(name,desc,price,category,id);
+						itemlist.put(id, item);
 					}
 					catch(PatternException pe) {
 						JOptionPane.showMessageDialog(null, pe.getMessage());
+					}
+					Report rpt = new Report(id,name,0,0.0);
+					reportlist.put(id,rpt);
 					}
 					//catches exception in parsing string to integers
 					catch(NumberFormatException e) {
