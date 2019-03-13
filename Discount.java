@@ -7,22 +7,22 @@ import java.util.LinkedList;
 
 
 public class Discount {
-	private double discount = 0.0;
 	public static double totalDiscount=0.0;
+	private double discount = 0.0;
 	//Reference - http://www.java67.com/2016/12/how-to-get-current-day-month-year-from-date-in-java8.html
 	
 	//Method to calculate discount
 	public double calculateDiscount(double cost,LinkedList<Order> orderlist) {
 		//taking current day to decide on the type of discount
-		Date today = new Date( );
+		Date today = new Date();
 		Calendar c = Calendar.getInstance();
 		c.setTime(today);
-		System.out.println(today);
 		int day = c.get(Calendar.DAY_OF_WEEK);
 		if(day == 6 || day == 7 )
 			discount = WeekendDiscount(orderlist);
 		else 
 			discount = WeekdayDiscount(cost);
+		totalDiscount+=discount;
 		return discount;
 	}
 	
