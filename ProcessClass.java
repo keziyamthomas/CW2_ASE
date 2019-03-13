@@ -20,7 +20,7 @@ import javax.swing.JOptionPane;
 
 
 public class ProcessClass {
-	public HashMap<String,Item> itemlist = new HashMap<String,Item>();
+	public static HashMap<String,Item> itemlist = new HashMap<String,Item>();
 	public HashMap<String,Report> reportlist = new HashMap<String,Report>();
 	public LinkedList<Order> orderlist = new LinkedList<Order>();
     public LinkedList<Order> currentQueueOrder = new LinkedList<Order>();
@@ -72,7 +72,7 @@ public class ProcessClass {
 						if(!m.find()){
 							throw new PatternException("Incorrect Id: " + id +" in Items.csv. The item Id should have the following pattern:<BIT/HOT/SHK/CCD><3-digit number> eg:BIT123, HOT123, SHK123, CCD123");
 						}
-						Item item = new Item(name,desc,price,category,id,millisec);
+						Item item = new Item(name,desc,price,category,id,milliSec);
 						itemlist.put(id, item);
 					}
 					catch(PatternException pe) {

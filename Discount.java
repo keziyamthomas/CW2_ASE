@@ -8,6 +8,7 @@ import java.util.LinkedList;
 
 public class Discount {
 	private double discount = 0.0;
+	public static double totalDiscount=0.0;
 	//Reference - http://www.java67.com/2016/12/how-to-get-current-day-month-year-from-date-in-java8.html
 	
 	//Method to calculate discount
