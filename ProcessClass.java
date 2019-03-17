@@ -23,13 +23,20 @@ public class ProcessClass {
 	public static HashMap<String,Item> itemlist = new HashMap<String,Item>();
 	public HashMap<String,Report> reportlist = new HashMap<String,Report>();
 	public LinkedList<Order> orderlist = new LinkedList<Order>();
-    public LinkedList<Order> currentQueueOrder = new LinkedList<Order>();
-	
-	public Waiter waiter1=new Waiter("Waiter Sam",currentQueueOrder);
-    public Waiter waiter2=new Waiter("Waiter John",currentQueueOrder);
+   
+	Serve serve=new Serve();
+	public Waiter waiter1=new Waiter("Waiter Sam",serve);
+    public Waiter waiter2=new Waiter("Waiter John",serve);
     
-    public Thread t1=new Thread(waiter1);
-    public Thread t2=new Thread(waiter2);
+    public Thread t1=new Thread(waiter1,"Waiter Sam");
+    public Thread t2=new Thread(waiter2,"Waiter John");
+    public Cook cook1=new Cook("Cook Bob",serve);
+    public Cook cook2=new Cook("Cook Ram",serve);
+    public Cook cook3=new Cook("Cook Mira",serve);
+    
+    public Thread t3=new Thread(cook1,"Cook Bob");
+    public Thread t4=new Thread(cook2,"Cook Ram");
+    public Thread t5=new Thread(cook3,"Cook Mira");
 	
 	//This method will return the LinkedList of Orders
 	public LinkedList<Order> getOrderList(){
@@ -130,7 +137,12 @@ public class ProcessClass {
 					try {
 					Order order = new Order(ts,id,itemid,quantity,amount);
 					orderlist.add(order);
-					currentQueueOrder.add(order);
+					Serve.currentQueueOrder.add(order);
+					if(!Serve.currentQueue.contains(id))
+					{
+						Serve.currentQueue.add(id);
+						System.out.println(Serve.currentQueue);
+					}
 					}
 					catch(PatternException pe) {
 					   JOptionPane.showMessageDialog(null, pe.getMessage());
@@ -159,29 +171,25 @@ public class ProcessClass {
 	//This method appends new orders with existing orders
 	public void addOrder(LinkedList<Order> list) {
 		orderlist.addAll(list);
-		currentQueueOrder.addAll(list);
-		for (Order o:orderlist)
+		Serve.currentQueueOrder.addAll(list);
+		try
 		{
-		System.out.println(o.getAmount());
+		if(!Serve.currentQueue.contains(list.get(0).getCustId()))
+		{
+			Serve.currentQueue.add(list.get(0).getCustId());
+			System.out.println(Serve.currentQueue);
 		}
-		System.out.println(list);
-		
-		
+		}
+		catch(Exception e) {}		
 	}
 	
 	public void startService()
 	{
-		if(!t1.isAlive())
-		{
-		
-	    try{t1.start();}catch(IllegalThreadStateException e) {Thread t1=new Thread(waiter1);t1.start();}
-		}
-		if(!t2.isAlive())
-		{	
-			
-		try{t2.start();}catch(IllegalThreadStateException e) {Thread t2=new Thread(waiter2);t2.start();}
-		}
-    
+	    try{t1.start();}catch(IllegalThreadStateException e){}
+		try{t2.start();}catch(IllegalThreadStateException e){}
+		try{t3.start();}catch(IllegalThreadStateException e){}
+		try{t4.start();}catch(IllegalThreadStateException e){}
+		try{t5.start();}catch(IllegalThreadStateException e){}
 	}
 		
 	

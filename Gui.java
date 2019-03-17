@@ -24,9 +24,11 @@ public class Gui extends javax.swing.JFrame {
         initComponents();
         model = (DefaultTableModel)orderTable.getModel();
         processClass = new ProcessClass();
+        
         //Load the Menu
         processClass.readItems();
         hash = processClass.getItemList();
+        
         //Load the unprocessed 
         processClass.readOrder();
         
@@ -191,7 +193,7 @@ public class Gui extends javax.swing.JFrame {
             }
         });
 
-        itemsCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "--Select a category--" }));
+        itemsCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] {"--Select a category--" }));
         itemsCombo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 itemsComboActionPerformed(evt);
@@ -367,8 +369,13 @@ public class Gui extends javax.swing.JFrame {
     }// </editor-fold>                        
 
     private void deleteBtnActionPerformed(java.awt.event.ActionEvent evt) {                                          
-        model.removeRow(orderTable.getSelectedRow());
+        try{model.removeRow(orderTable.getSelectedRow());}catch(Exception e) {}
         quantityTextbox.setText(null);
+        for(int i=0;i<model.getRowCount();i++)
+        {
+        	model.setValueAt(i+1, i, 0);
+        }
+       
         
     }                                         
 
@@ -382,6 +389,8 @@ public class Gui extends javax.swing.JFrame {
     	catch(Exception e) {
     		x = 1;
     	}
+    	if(itemsCombo.getSelectedItem()!="--Select a category--")
+    	{
     	if(x < 10 ) {
             model.insertRow(model.getRowCount(),new Object[]{model.getRowCount()+1,
             		itemsCombo.getSelectedItem(),
@@ -392,10 +401,12 @@ public class Gui extends javax.swing.JFrame {
     		warningLabel.setText("Quantity should be less than 10!!!");
     		quantityTextbox.setText(null);
     	}
+    	}
     }                                               
 
-    private void editBtnActionPerformed(java.awt.event.ActionEvent evt) {                                        
-        
+    private void editBtnActionPerformed(java.awt.event.ActionEvent evt) {
+    	try
+    	{
         int x = Integer.parseInt((String) quantityTextbox.getText());
     	if(x < 10 ) {
     		model.setValueAt(quantityTextbox.getText(), orderTable.getSelectedRow(),3);
@@ -404,6 +415,8 @@ public class Gui extends javax.swing.JFrame {
     		warningLabel.setText("Quantity should be less than 10!!!");
     		quantityTextbox.setText(null);
     	}
+    	}
+    	catch(Exception e) {}
 
     }                                       
 
@@ -435,7 +448,6 @@ public class Gui extends javax.swing.JFrame {
         totalLabel.setText(Double.toString((double)total - discountAmt));
         discountAmtLabel.setText(Double.toString(discountAmt));
         processClass.addOrder(orderList);
-        processClass.startService();
     }                                        
 
     private void hotBeverageBtnActionPerformed(java.awt.event.ActionEvent evt) {                                               

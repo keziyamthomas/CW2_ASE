@@ -69,6 +69,67 @@ public class Serve {
 		}
 		return name;
 	}
-	
+	public void startCook()
+	{
+		int MilliSec;
+		String currCust;
+		try
+		{
+			synchronized(Serve.currentCookOrder)
+			{
+				
+		        LinkedList<Order>currOrder =getFirstOrder(Serve.currentCookOrder);
+		        MilliSec=getTotalMilliSec(currOrder)/1000;
+		        currCust=currOrder.getFirst().getCustId();
+		        System.out.println(Thread.currentThread().getName()+" Currently Started Cooking for:" +currCust+".Total time:"+MilliSec+" min");
+		        
+		        Serve.currentCookOrder.removeAll(currOrder);
+		        
+		        Serve.currentCookOrder.notifyAll();	
+		      
+			}
+			for(int i=MilliSec;i>=0;i=i-1)
+			{
+				try{Thread.sleep(1000);} catch(Exception e){}
+				System.out.println(i+" "+Thread.currentThread().getName());
+			}
+			System.out.println(Thread.currentThread().getName()+" Finished Cooking for:" +currCust);
+			Thread.sleep(1000);
+			System.out.println(currCust+" Recieved Food Ordered");
+		
+		} 
+		catch(Exception e) {}
+		}
+	public void serviceOrder()
+	{
+		int MilliSec;
+		String currCust=null;
+		
+		try
+		{
+			synchronized(Serve.currentQueueOrder)
+			{
+				Thread.sleep(1000);	
+		        LinkedList<Order>currOrder =getFirstOrder(Serve.currentQueueOrder);
+		        MilliSec=getTotalMilliSec(currOrder)/1000;
+		        currCust=currOrder.getFirst().getCustId();
+		        System.out.println(Serve.currentQueue);
+		        System.out.println("Current First Order:" +currCust);
+		        System.out.println(Thread.currentThread().getName()+" Currently Taking Order from:" +currCust+".Total time:"+MilliSec+" min");
+		        System.out.println("Food ordered are:");
+		        for(Order o:currOrder)
+		        {
+		        	System.out.println(getNameByItemId(o.getItemId())+" "+o.getQuantity());
+		        }
+		        Serve.currentCookOrder.addAll(currOrder);
+		        Serve.currentQueueOrder.removeAll(currOrder);
+		        Serve.currentQueue.remove(currOrder.get(0).getCustId());
+		        Serve.currentQueueOrder.notifyAll();		        		    
+		        Thread.sleep(1000);		       
+			}
+
+		} 
+	catch(Exception e) {}		
+	}
 
 }
