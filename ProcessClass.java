@@ -30,6 +30,7 @@ public class ProcessClass {
     
     public Thread t1=new Thread(waiter1,"Waiter Sam");
     public Thread t2=new Thread(waiter2,"Waiter John");
+    
     public Cook cook1=new Cook("Cook Bob",serve);
     public Cook cook2=new Cook("Cook Ram",serve);
     public Cook cook3=new Cook("Cook Mira",serve);
@@ -124,25 +125,24 @@ public class ProcessClass {
 			while(scan.hasNextLine()) {
 				text=scan.nextLine();
 				try {
-					//splitting each line of the file to store in different variables
-					String[] parts = text.split(",");
-					String time = parts[0];
-					SimpleDateFormat format = new SimpleDateFormat("dd/MM/YYYY hh:mm");
-					Date date = format.parse(time);
-					Timestamp ts = new Timestamp(date.getTime());
-					String id = parts[1];
-					String itemid = parts[2];
-					int quantity = Integer.parseInt(parts[3]);
-					double amount = Double.parseDouble(parts[4]);
-					try {
-					Order order = new Order(ts,id,itemid,quantity,amount);
-					orderlist.add(order);
-					Serve.currentQueueOrder.add(order);
-					if(!Serve.currentQueue.contains(id))
-					{
-						Serve.currentQueue.add(id);
-						System.out.println(Serve.currentQueue);
-					}
+						//splitting each line of the file to store in different variables
+						String[] parts = text.split(",");
+						String time = parts[0];
+						SimpleDateFormat format = new SimpleDateFormat("dd/MM/YYYY hh:mm");
+						Date date = format.parse(time);
+						Timestamp ts = new Timestamp(date.getTime());
+						String id = parts[1];
+						String itemid = parts[2];
+						int quantity = Integer.parseInt(parts[3]);
+						double amount = Double.parseDouble(parts[4]);
+						try {
+						Order order = new Order(ts,id,itemid,quantity,amount);
+						orderlist.add(order);
+						Serve.currentQueueOrder.add(order);
+						if(!Serve.serveQueue.containsKey(id))
+						{
+							Serve.serveQueue.put(id, "New");
+						}
 					}
 					catch(PatternException pe) {
 					   JOptionPane.showMessageDialog(null, pe.getMessage());
@@ -174,13 +174,13 @@ public class ProcessClass {
 		Serve.currentQueueOrder.addAll(list);
 		try
 		{
-		if(!Serve.currentQueue.contains(list.get(0).getCustId()))
-		{
-			Serve.currentQueue.add(list.get(0).getCustId());
-			System.out.println(Serve.currentQueue);
+			if(!Serve.serveQueue.containsKey(list.get(0).getCustId()))
+			{
+			Serve.serveQueue.put(list.get(0).getCustId(), "New");
+			}
 		}
-		}
-		catch(Exception e) {}		
+		catch(Exception e){}
+		
 	}
 	
 	public void startService()

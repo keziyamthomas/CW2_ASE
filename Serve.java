@@ -1,16 +1,16 @@
 package coffeeshopapp;
 
+
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
+import java.util.TreeMap;
 
 public class Serve {
 
 	public static LinkedList<Order> currentQueueOrder=new LinkedList<Order>();
 	public static LinkedList<Order> currentCookOrder=new LinkedList<Order>();
 	
-	public static Queue<String> currentQueue=new LinkedList<>();
-	public static Queue<String> currentCookingQueue=new LinkedList<>();
+	public static TreeMap<String,String> serveQueue=new TreeMap<String,String>();
 	
 	//Get first order in the queue
 	public LinkedList<Order> getFirstOrder(LinkedList<Order> currentOrder) {
@@ -90,7 +90,8 @@ public class Serve {
 		        //Remove order from cooking queue
 		        Serve.currentCookOrder.removeAll(currOrder);       
 		        Serve.currentCookOrder.notifyAll();	
-		      
+		        Serve.serveQueue.replace(currCust, "Preparing");
+		        System.out.println(Serve.serveQueue);
 			}
 			
 			//Time taken for cooking according to the food ordered
@@ -100,13 +101,23 @@ public class Serve {
 				System.out.println(i+" "+Thread.currentThread().getName());
 			}
 			System.out.println(Thread.currentThread().getName()+" Finished Cooking for:" +currCust);
+			Serve.serveQueue.replace(currCust, "Ready");
+			System.out.println(Serve.serveQueue);
 			Thread.sleep(1000);
 			System.out.println(currCust+" Recieved Food Ordered");
 			
-			//Remove customer from cooking queue after finishing cooking
-			Serve.currentCookingQueue.remove();
-			System.out.println("Cooking to be finished for:"+Serve.currentCookingQueue);
-		
+			Serve.serveQueue.replace(currCust, "Delivered");
+			System.out.println(Serve.serveQueue);
+			
+			Thread.sleep(1000);
+			Serve.serveQueue.replace(currCust, "Left the shop");
+			System.out.println(Serve.serveQueue);
+			
+			Thread.sleep(2000);
+			Serve.serveQueue.remove(currCust);
+			System.out.println(Serve.serveQueue);
+			
+			
 		} 
 		catch(Exception e) {}
 		}
@@ -125,7 +136,7 @@ public class Serve {
 		        LinkedList<Order>currOrder =getFirstOrder(Serve.currentQueueOrder);
 		        MilliSec=getTotalMilliSec(currOrder)/1000;
 		        currCust=currOrder.getFirst().getCustId();
-		        System.out.println("Current waiting queue:"+Serve.currentQueue);
+		        //System.out.println("Current waiting queue:"+Serve.currentQueue);
 		        System.out.println("Current First Order:" +currCust);
 		        System.out.println(Thread.currentThread().getName()+" Currently Taking Order from:" +currCust+".Total time:"+MilliSec+" min");
 		       
@@ -136,14 +147,13 @@ public class Serve {
 		        	System.out.println(getNameByItemId(o.getItemId())+" "+o.getQuantity());
 		        }
 		        
+		        Serve.serveQueue.replace(currCust, "Waiting");
+		        System.out.println(Serve.serveQueue);
 		        //Adding order to cooking queue
 		        Serve.currentCookOrder.addAll(currOrder);
-		        Serve.currentCookingQueue.add(currCust);
-		        System.out.println("Cooking to be finished for:"+Serve.currentCookingQueue);
 		        
 		        //Removing order from current waiting queue once took order
 		        Serve.currentQueueOrder.removeAll(currOrder);
-		        Serve.currentQueue.remove(currOrder.get(0).getCustId());
 		        Serve.currentQueueOrder.notifyAll();		        		    
 		        Thread.sleep(1000);		       
 			}
