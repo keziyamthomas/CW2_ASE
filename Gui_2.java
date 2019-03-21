@@ -15,17 +15,13 @@ import java.util.*;
 import java.util.logging.Logger;
 import model.*;
 import controller.*;
-;/**
- *
- * @author Nishna2
- */
+
 public class Gui_2 extends javax.swing.JFrame {
 
-    /**
+    /**model_order
      * Creates new form Gui_1
      */
     DefaultTableModel model_order;
-    static ProcessClass process;
     public Gui_2() {
         initComponents();
         DateTime();
@@ -418,7 +414,8 @@ public class Gui_2 extends javax.swing.JFrame {
         */
         
         int remove_index = jComboBox_delete_waiter.getSelectedIndex();
-        
+        String waiter=jComboBox_delete_waiter.getItemAt(remove_index);
+        Gui_New_Order.processClass.removeWaiter(waiter);
         jPanel4.remove(remove_index + 1); //removing subpanel
         jPanel4.repaint();
         jPanel4.revalidate();
@@ -453,7 +450,8 @@ public class Gui_2 extends javax.swing.JFrame {
         */
         
         int remove_index = jComboBox_delete_cook.getSelectedIndex();
-        
+        String cook=jComboBox_delete_cook.getItemAt(remove_index);
+        Gui_New_Order.processClass.removeCook(cook);
         jPanel5.remove(remove_index + 1); //removing subpanel
         jPanel5.repaint();
         jPanel5.revalidate();
@@ -521,7 +519,7 @@ public class Gui_2 extends javax.swing.JFrame {
                 for(;;){
                 	view_queue();
                     try{
-                        sleep(3000);
+                        sleep(1000);
                     }
                     catch(InterruptedException ex){
                         System.out.println(ex.getStackTrace());

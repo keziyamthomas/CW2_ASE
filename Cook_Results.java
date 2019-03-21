@@ -8,10 +8,7 @@ package view;
 import javax.swing.BoxLayout;
 import controller.*;
 import observer_pattern.Observer;
-/**
- *
- * @author Nishna2
- */
+
 public class Cook_Results extends javax.swing.JPanel {
 
     /**

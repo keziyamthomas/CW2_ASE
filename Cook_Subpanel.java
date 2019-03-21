@@ -11,10 +11,6 @@ import java.util.*;
 import model.*;
 import controller.*;
 
-/**
- *
- * @author Nishna2
- */
 public class Cook_Subpanel extends javax.swing.JPanel
 						   implements Runnable{
 
@@ -91,27 +87,41 @@ public class Cook_Subpanel extends javax.swing.JPanel
     // End of variables declaration//GEN-END:variables
     
     public void run() {
-        while(true){
-        	String text="No order to process";
-        	LinkedList<Order> cOrder=ProcessClass.cookList.get(this.name).getCurr();
-        	if(!cOrder.isEmpty())
-        	{
-        		
-        		text="\n Preparation time :"+ProcessClass.cookList.get(this.name).getMilliSec();
-        		text+="\nCurrently Preparing:"+cOrder.getFirst().getCustId();
-        	for(Order o:cOrder){
-        		
-        		
-        		String itemId=o.getItemId();
-        		String itemName=ProcessClass.itemlist.get(itemId).getItemName();
-        		text+="\n" + itemName + " " + o.getQuantity();
-        	}
-        	text+="\n"+ProcessClass.cookList.get(this.name).getSec();
-        	try{Thread.sleep(1000);}catch(Exception e) {}
-        	}
-            jTextArea1.setText(text);    
-        	
-        }
+    	while(true)
+  	  {
+  	         String text="No order to process";
+  	         LinkedList<Order> cOrder=ProcessClass.cookList.get(this.name).getCurr();
+  	         if(!cOrder.isEmpty())
+  	         {
+  	         text="Currently Preparing:"+cOrder.getFirst().getCustId();
+  	         text+="\n Preparation time :"+ProcessClass.cookList.get(this.name).getMilliSec();
+  	         for(Order o:cOrder){
+  	          String itemId=o.getItemId();
+  	          String itemName=ProcessClass.itemlist.get(itemId).getItemName();
+  	          text+="\n" + itemName + " " + o.getQuantity();
+  	         }
+  	        text+="\n"+ProcessClass.cookList.get(this.name).getSec();
+  	         }
+  	            jTextArea1.setText(text);     
+  	        }
+//        while(true){
+//        	String text="No order to process";
+//        	LinkedList<Order> cOrder=ProcessClass.cookList.get(this.name).getCurr();
+//        	if(!cOrder.isEmpty())
+//        	{
+//        		text="Currently Preparing:"+cOrder.getFirst().getCustId();
+//        		text+="\n Preparation time :"+ProcessClass.cookList.get(this.name).getMilliSec();
+//        		
+//        	for(Order o:cOrder){
+//        		String itemId=o.getItemId();
+//        		String itemName=ProcessClass.itemlist.get(itemId).getItemName();
+//        		text+="\n" + itemName + " " + o.getQuantity();
+//        	}
+//        	text+="\n"+ProcessClass.cookList.get(this.name).getSec();
+//        	//try{Thread.sleep(1000);}catch(Exception e) {}
+//        	}
+//            jTextArea1.setText(text);
+//        	}
     }
 
 

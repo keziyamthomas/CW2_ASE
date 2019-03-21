@@ -8,10 +8,7 @@ import controller.ProcessClass;
  * and open the template in the editor.
  */
 
-/**
- *
- * @author Nishna2
- */
+
 public class Gui_Report extends javax.swing.JFrame {
 
     /**

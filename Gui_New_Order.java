@@ -15,11 +15,6 @@ import javax.swing.table.DefaultTableModel;
 import model.*;
 import controller.*;
 
-/**
- *
- * @author Nishna2
- */
-
 public class Gui_New_Order extends javax.swing.JFrame {
 
     /**
@@ -28,7 +23,7 @@ public class Gui_New_Order extends javax.swing.JFrame {
 	DefaultTableModel model;
     HashMap<String, Item> hash;
     LinkedList<Order> orderList;
-    ProcessClass processClass ;
+    static ProcessClass processClass ;
     
     public Gui_New_Order() {
         initComponents();

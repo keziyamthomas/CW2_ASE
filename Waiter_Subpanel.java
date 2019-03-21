@@ -7,10 +7,7 @@ package view;
 import model.*;
 import java.util.*;
 import controller.*;
-/**
- *
- * @author Nishna2
- */
+
 public class Waiter_Subpanel extends javax.swing.JPanel implements Runnable {
 
 	String name;
@@ -48,7 +45,7 @@ public class Waiter_Subpanel extends javax.swing.JPanel implements Runnable {
     	          text+="\n" + itemName + " " + o.getQuantity();
     	         }
     	         }
-    	         try{Thread.sleep(1000);}catch(Exception e) {}
+    	         //try{Thread.sleep(1000);}catch(Exception e) {}
     	            jTextArea1.setText(text);     
     	        }
     }

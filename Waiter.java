@@ -41,7 +41,7 @@ public class Waiter implements Runnable {
 		{
 			synchronized(queueOrder)
 			{
-				Thread.sleep(1000);	
+				Thread.sleep(ProcessClass.order_time);
 		        this.curr =serve.getFirstOrder(queueOrder);
 		        MilliSec=serve.getTotalMilliSec(this.curr)/1000;
 		        currCust=this.curr.getFirst().getCustId();
@@ -56,7 +56,6 @@ public class Waiter implements Runnable {
 		        {
 		        	logger.logEntry(serve.getNameByItemId(o.getItemId())+" "+o.getQuantity());
 		        }
-		        Thread.sleep(ProcessClass.order_time);
 		        Serve.serveQueue.replace(currCust, "Waiting");
 		        //Adding order to cooking queue
 		        Serve.currentCookOrder.addAll(this.curr);
@@ -64,7 +63,7 @@ public class Waiter implements Runnable {
 		        //Removing order from current waiting queue once took order
 		        queueOrder.removeAll(this.curr);
 		        queueOrder.notifyAll();		        		    
-		        Thread.sleep(1000);		       
+		       	       
 			}
 
 		} 

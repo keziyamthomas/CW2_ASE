@@ -10,10 +10,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.*;
 
-/**
- *
- * @author Nishna2
- */
 public class Waiter_Results extends javax.swing.JPanel {
 
     /**

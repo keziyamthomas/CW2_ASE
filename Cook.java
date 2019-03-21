@@ -5,8 +5,6 @@ import java.util.LinkedList;
 import model.*;
 
 
-
-
 public class Cook implements Runnable {
 	private String name;
 	private int MilliSec;
@@ -40,7 +38,7 @@ public class Cook implements Runnable {
 			{
 				synchronized(Serve.currentCookOrder)
 				{
-					
+					Thread.sleep(ProcessClass.prep_time);
 			        this.curr =serve.getFirstOrder(Serve.currentCookOrder);
 			        MilliSec=serve.getTotalMilliSec(this.curr)/1000;
 			        currCust=this.curr.getFirst().getCustId();
