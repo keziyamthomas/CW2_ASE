@@ -1,4 +1,8 @@
-package coffeeshopapp;
+package model;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class Item {
 	private String itemName;
 	private String description;
@@ -7,14 +11,18 @@ public class Item {
 	private String id;
 	private int cookTimeMS;
 	
-	public Item(String itemName, String description, double price, String category, String id,int cookTimeMS) {
-		super();
-		this.itemName = itemName;
-		this.description = description;
-		this.price = price;
-		this.category = category;
-		this.id = id;
-		this.cookTimeMS=cookTimeMS;
+	public Item(String itemName, String description, double price, String category, String id,int cookTimeMS) throws PatternException{
+		if(!match(id)) {
+			throw new PatternException("The item id should have the following pattern: BIT / HOT / SHK / CCD and <a 3-digit number> eg.CUST123");
+		}
+		else {
+			this.itemName = itemName;
+			this.description = description;
+			this.price = price;
+			this.category = category;
+			this.id = id;
+			this.cookTimeMS=cookTimeMS;
+		}
 	}
 	
 	public String getItemName() {
@@ -53,6 +61,11 @@ public class Item {
 	public void setCookTimeMS(int cookTimeMS) {
 		this.cookTimeMS = cookTimeMS;
 	}
-
+	public boolean match(String id) {
+		String pattern = "BIT|HOT|SHK|CCD\\d{3}";
+		Pattern pat = Pattern.compile(pattern);
+		Matcher m = pat.matcher(id);
+		return m.find();
+	}
 
 }

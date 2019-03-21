@@ -3,10 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package coffeeshopapp;
+package view;
 
 import javax.swing.BoxLayout;
-
+import controller.*;
+import observer_pattern.Observer;
 /**
  *
  * @author Nishna2
@@ -35,11 +36,11 @@ public class Cook_Results extends javax.swing.JPanel {
   }
     
     public void layoutCookResults(String name) {
-        
-        
-           Cook_Subpanel subPanel = new Cook_Subpanel(name);
-           subPanel.setName(name);
-           this.add(subPanel);
+       //Cook cook_obj = new Cook();
+       Cook_Subpanel subPanel = new Cook_Subpanel(name);
+     //  Gui_2.process.Attach(subPanel);
+       subPanel.setName(name);
+       this.add(subPanel);
         
      //System.out.println(this.getComponentCount() + " " + this.getComponent(1).toString());
      revalidate();

@@ -3,20 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package coffeeshopapp;
-
-import java.awt.Component;
-import static java.lang.Thread.sleep;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import javax.swing.BoxLayout;
-
+package view;
+import model.*;
+import java.util.*;
+import controller.*;
 /**
  *
  * @author Nishna2
  */
-public class Waiter_Subpanel extends javax.swing.JPanel {
+public class Waiter_Subpanel extends javax.swing.JPanel implements Runnable {
 
+	String name;
     /**
      * Creates new form Waiter_Subpanel
      */
@@ -26,44 +23,34 @@ public class Waiter_Subpanel extends javax.swing.JPanel {
         // Layout the content vertically
         BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
         this.setLayout(layout);*/
-        jLabel_waitername.setText("Waiter_" + name);
-        System.out.println("In WaiterSubpanel "+  +this.getComponentCount()+ jLabel_waitername.getText());
+        this.name=name;
+        jLabel_waitername.setText(name);
+        //System.out.println("In WaiterSubpanel "+  +this.getComponentCount()+ jLabel_waitername.getText());
         this.setVisible(true);
-        DateTime();
         this.repaint();
         this.revalidate();
-        this.setName(name);
+        Thread t=new Thread(this,this.name);
+        t.start();
     }
     
-    public void DateTime() {
+    public void run() {
         //Function that updates date and time
-        Thread thread_datetime = new Thread(){
-            public void run(){
-                for(;;){
-                    Calendar calendar = new GregorianCalendar();
-                    int mm = calendar.get(Calendar.MONTH);
-                    int yy = calendar.get(Calendar.YEAR);
-                    int dd = calendar.get(Calendar.DAY_OF_MONTH);
-                    int ss = calendar.get(Calendar.SECOND);
-                    int min = calendar.get(Calendar.MINUTE);
-                    int hh = calendar.get(Calendar.HOUR);
-                    /*jTextArea1.append("Date :  " + dd + "/ " + (mm + 1) + "/ " + yy +
-                            "    " + hh + ":" + min + ":" + ss + "\n");
-                    */
-                    String new_data = "Date :  " + dd + "/ " + (mm + 1) + "/ " + yy +
-                            "    " + hh + ":" + min + ":" + ss + "\n" ;
-                    String old_data = jTextArea1.getText();
-                    jTextArea1.setText(new_data + "\n" + old_data);
-                    try{
-                        sleep(2000);
-                    }
-                    catch(InterruptedException ex){
-                        System.out.println(ex.getStackTrace());
-                    }
-                }
-            }
-        };
-        thread_datetime.start();
+    	 while(true)
+    	  {
+    	         String text="";
+    	         LinkedList<Order> cOrder=ProcessClass.waiterList.get(this.name).getCurr();
+    	         if(!cOrder.isEmpty())
+    	         {
+    	         text="Currently Servicing:"+cOrder.getFirst().getCustId();
+    	         for(Order o:cOrder){
+    	          String itemId=o.getItemId();
+    	          String itemName=ProcessClass.itemlist.get(itemId).getItemName();
+    	          text+="\n" + itemName + " " + o.getQuantity();
+    	         }
+    	         }
+    	         try{Thread.sleep(1000);}catch(Exception e) {}
+    	            jTextArea1.setText(text);     
+    	        }
     }
     /**
      * This method is called from within the constructor to initialize the form.

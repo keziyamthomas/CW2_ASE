@@ -1,8 +1,9 @@
-package coffeeshopapp;
+package controller;
 
 import java.util.Date;
 import java.util.Calendar;
 import java.util.LinkedList;
+import model.*;
 
 
 

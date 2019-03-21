@@ -3,35 +3,41 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package coffeeshopapp;
+package view;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
-import sun.invoke.empty.Empty;
+import java.util.*;
+
+import model.*;
+import controller.*;
 
 /**
  *
  * @author Nishna2
  */
-public class Cook_Subpanel extends javax.swing.JPanel {
+public class Cook_Subpanel extends javax.swing.JPanel
+						   implements Runnable{
 
     /**
      * Creates new form Cook_Subpanel
+     * 
      */
+	String text = null;
+	String name;
     public Cook_Subpanel(String name) {
         initComponents();
         
-        jLabel_cookname.setText("Cook_" + name);
+        jLabel_cookname.setText(name);
         this.setVisible(true);
-        this.setName(name);
+        this.name = name;
         this.repaint();
         this.revalidate();
-        this.setName(name);
+        Thread t=new Thread(this,this.name);
+        t.start();
         
         //System.out.println("In Cook Subpanel "+  +this.getComponentCount()+ this.getName());
         //-------------------------------------------------------------------------------------
-        display_cooking_status();
+        //display_cooking_status_old();
         //-------------------------------------------------------------------------------------
     }
 
@@ -76,31 +82,40 @@ public class Cook_Subpanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    public void display_cooking_status() {
-        //Function that updates date and time
-        Thread thread_datetime = new Thread(){
-            public void run(){
-                for(;;){
-                    String new_data = Serve.serveQueue.toString() ;
 
-                    String old_data = jTextArea1.getText();
-                    jTextArea1.setText(new_data + "\n" + old_data);
-                    try{
-                        sleep(2000);
-                    }
-                    catch(InterruptedException ex){
-                        System.out.println(ex.getStackTrace());
-                    }
-                }
-            }
-        };
-        thread_datetime.start();
-        
-        
-    }
+   
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel_cookname;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea1;
     // End of variables declaration//GEN-END:variables
+    
+    public void run() {
+        while(true){
+        	String text="No order to process";
+        	LinkedList<Order> cOrder=ProcessClass.cookList.get(this.name).getCurr();
+        	if(!cOrder.isEmpty())
+        	{
+        		
+        		text="\n Preparation time :"+ProcessClass.cookList.get(this.name).getMilliSec();
+        		text+="\nCurrently Preparing:"+cOrder.getFirst().getCustId();
+        	for(Order o:cOrder){
+        		
+        		
+        		String itemId=o.getItemId();
+        		String itemName=ProcessClass.itemlist.get(itemId).getItemName();
+        		text+="\n" + itemName + " " + o.getQuantity();
+        	}
+        	text+="\n"+ProcessClass.cookList.get(this.name).getSec();
+        	try{Thread.sleep(1000);}catch(Exception e) {}
+        	}
+            jTextArea1.setText(text);    
+        	
+        }
+    }
+
+
+
+
+	
 }

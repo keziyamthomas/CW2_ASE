@@ -1,4 +1,5 @@
-package coffeeshopapp;
+package model;
+
 import java.sql.Timestamp;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package coffeeshopapp;
+package view;
 
 import java.sql.Timestamp;
 import java.util.HashMap;
@@ -12,6 +12,8 @@ import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import model.*;
+import controller.*;
 
 /**
  *
@@ -40,6 +42,7 @@ public class Gui_New_Order extends javax.swing.JFrame {
         //Load the unprocessed 
         processClass.readOrder();
         
+              
         //Start servicing the orders
         processClass.startService();
     }
@@ -87,6 +90,11 @@ public class Gui_New_Order extends javax.swing.JFrame {
         jButton_view = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
         setLocation(new java.awt.Point(0, 0));
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
@@ -176,7 +184,7 @@ public class Gui_New_Order extends javax.swing.JFrame {
 
         jLabel3.setText("Select Item");
 
-        jComboBox_items.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBox_items.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] {"--Select a category--" }));
         jComboBox_items.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox_itemsActionPerformed(evt);
@@ -300,6 +308,11 @@ public class Gui_New_Order extends javax.swing.JFrame {
             public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
             }
+            @Override
+            public boolean isCellEditable(int row, int column) {
+            	return column == 3 ? true : false ;
+            }
+            
         });
         jTable_order.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -456,10 +469,8 @@ public class Gui_New_Order extends javax.swing.JFrame {
 
     private void jButton_add_to_queueActionPerformed(java.awt.event.ActionEvent evt) {                                                     
         // Add to Queue
-        // Print Receipt
-    	processClass.addOrder(orderList);
-        Gui_Receipt receipt = new Gui_Receipt();
-        receipt.setVisible(true);
+        processClass.addOrder(orderList);
+        
     }                                                    
 
     private void jButton_hot_beverageActionPerformed(java.awt.event.ActionEvent evt) {                                                     
@@ -510,7 +521,12 @@ public class Gui_New_Order extends javax.swing.JFrame {
     }                                                   
 
     private void jCheckBox_onlineActionPerformed(java.awt.event.ActionEvent evt) {                                                 
-        // TODO add your handling code here:
+        if(jCheckBox_online.isSelected()) {
+        	ProcessClass.online = true;
+        }
+        else {
+        	ProcessClass.online = false;
+        }
     }                                                
 
     private void jComboBox_itemsActionPerformed(java.awt.event.ActionEvent evt) {                                                
@@ -588,6 +604,16 @@ public class Gui_New_Order extends javax.swing.JFrame {
     private void jButton_viewActionPerformed(java.awt.event.ActionEvent evt) {                                             
         Gui_2 view = new Gui_2();
         view.setVisible(true);
+    }
+    
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {                                   
+        // Generate Report
+    	processClass.populateReportList();
+    	processClass.WriteToFile();
+    	String report_text = processClass.generateReport();
+    	Gui_Report report = new Gui_Report(report_text);
+    	report.setVisible(true);
+    	
     }
     
     private void calculate_total() {

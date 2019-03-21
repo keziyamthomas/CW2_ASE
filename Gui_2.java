@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package coffeeshopapp;
+package view;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -13,8 +13,9 @@ import javax.swing.JScrollPane;
 import javax.swing.table.DefaultTableModel;
 import java.util.*;
 import java.util.logging.Logger;
-
-/**
+import model.*;
+import controller.*;
+;/**
  *
  * @author Nishna2
  */
@@ -23,46 +24,53 @@ public class Gui_2 extends javax.swing.JFrame {
     /**
      * Creates new form Gui_1
      */
-    DefaultTableModel model_order,model_waiter,model_cook;
+    DefaultTableModel model_order;
+    static ProcessClass process;
     public Gui_2() {
         initComponents();
         DateTime();
         model_order = (DefaultTableModel)jTable_order_status.getModel();
         
+        /* Loading Queue Information */
+        Update_queue();
         /* Loading Waiter Processing Information */
-        String waiter_names[] = {"W1", "W2"}; //waiter name collection
-        for(String waiter_name : waiter_names){
+        //-----------------------------------------------------------------
+               
+        //-----------------------------------------------------------------
+        //waiter name collection
+        jComboBox_delete_waiter.removeAllItems();
+        for(Map.Entry<String, Waiter> entry : ProcessClass.waiterList.entrySet()){
+        	String waiter_name = entry.getKey();
+        	
+        	/* Loading waiter subpanels */
             Waiter_Results resultsPanel = new Waiter_Results();
             resultsPanel.layoutWaiterResults(waiter_name);
             jPanel4.add(resultsPanel, BorderLayout.EAST);
             resultsPanel.setVisible(true);
             getContentPane().repaint();
             getContentPane().revalidate();
+            
+            /* Loading waiter combobox */
+            jComboBox_delete_waiter.addItem(waiter_name);
          
         }
         
         /* Loading Cook Processing Information */
-        String cook_names[] = {"C1", "C2"}; //cook name collection
-        for(String cook_name : cook_names){
+        
+    	jComboBox_delete_cook.removeAllItems();
+        for(Map.Entry<String, Cook> entry : ProcessClass.cookList.entrySet()){
+        	String cook_name = entry.getKey();
+        	
+        	/* Loading cook subpanels */
             Cook_Results cook_resultsPanel = new Cook_Results();
             cook_resultsPanel.layoutCookResults(cook_name);
             jPanel5.add(cook_resultsPanel, BorderLayout.EAST);
             cook_resultsPanel.setVisible(true);
             getContentPane().repaint();
             getContentPane().revalidate();
-        }
-        
-        
-        /* Loading waiter_combobox */
-        jComboBox_delete_waiter.removeAllItems();
-        for(String waiter : waiter_names){
-            jComboBox_delete_waiter.addItem(waiter);
-        }
-        
-        /* Loading cook_combobox */
-        jComboBox_delete_cook.removeAllItems();
-        for(String cook : cook_names){
-            jComboBox_delete_cook.addItem(cook);
+            
+            /* Loading cook combo box */
+            jComboBox_delete_cook.addItem(cook_name);
         }
         
         
@@ -145,9 +153,9 @@ public class Gui_2 extends javax.swing.JFrame {
         jLabel3.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel3.setText("Cook");
 
-        jComboBox_delete_cook.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBox_delete_cook.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] {"--Select a Cook--" }));
 
-        jComboBox_delete_waiter.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBox_delete_waiter.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "--Select a Waiter--" }));
 
         jButton_delete_waiter.setText("Delete");
         jButton_delete_waiter.addActionListener(new java.awt.event.ActionListener() {
@@ -248,10 +256,7 @@ public class Gui_2 extends javax.swing.JFrame {
 
         jTable_order_status.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null}
+                
             },
             new String [] {
                 "Order Id", "Status"
@@ -306,19 +311,30 @@ public class Gui_2 extends javax.swing.JFrame {
         jPanel6.setBackground(new java.awt.Color(255, 255, 255));
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jLabel7.setText("LeadTimeSettings");
+        jLabel7.setText("Alter Simulation Speed");
 
-        jLabel8.setText("Prep Time Lead");
+        jLabel8.setText("Extend Preparation Time");
 
         jLabel9.setText("New Order Lead Time");
 
-        jComboBox_prep_time.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBox_prep_time.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "20", "15", "10", "5" }));
 
-        jComboBox_new_order_time.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBox_new_order_time.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "20", "15", "10", "5" }));
 
         jButton_prep_time.setText("Apply");
+        jButton_prep_time.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_prep_timeActionPerformed(evt);
+            }
+        });
 
         jButton_new_order.setText("Apply");
+        jButton_new_order.setText("Apply");
+        jButton_new_order.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_new_orderActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
@@ -463,6 +479,14 @@ public class Gui_2 extends javax.swing.JFrame {
         
     }//GEN-LAST:event_jButton_add_waiterActionPerformed
     
+    private void jButton_prep_timeActionPerformed(java.awt.event.ActionEvent evt) {                                                  
+        ProcessClass.prep_time = Integer.parseInt(jComboBox_prep_time.getSelectedItem().toString());
+    }                                                 
+
+    private void jButton_new_orderActionPerformed(java.awt.event.ActionEvent evt) {                                                  
+    	ProcessClass.order_time = Integer.parseInt(jComboBox_new_order_time.getSelectedItem().toString());
+    } 
+    
     public void DateTime() {
         //Function that updates date and time
         Thread thread_datetime = new Thread(){
@@ -490,7 +514,35 @@ public class Gui_2 extends javax.swing.JFrame {
         thread_datetime.start();
     }
     
+    public void Update_queue() {
+        //Function that updates date and time
+        Thread thread_datetime = new Thread(){
+            public void run(){
+                for(;;){
+                	view_queue();
+                    try{
+                        sleep(3000);
+                    }
+                    catch(InterruptedException ex){
+                        System.out.println(ex.getStackTrace());
+                    }
+                }
+            }
+        };
+        thread_datetime.start();
+    }
     
+    public void view_queue() {
+    	
+    	model_order.setNumRows(0);
+    	for(Map.Entry<String, String> r: Serve.serveQueue.entrySet()) {
+    		model_order.insertRow(model_order.getRowCount(),new Object[]{
+    				r.getKey(),
+    				r.getValue()
+            		});
+    		
+    	}
+    }
     /**
      * @param args the command line arguments
      */

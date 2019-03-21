@@ -1,4 +1,4 @@
-package coffeeshopapp;
+package controller;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,28 +17,35 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
+import model.*;
+import observer_pattern.Observer;
+import observer_pattern.Subject;
+import view.*;
 
 
-public class ProcessClass {
+public class ProcessClass implements Subject {
 	public static HashMap<String,Item> itemlist = new HashMap<String,Item>();
 	public HashMap<String,Report> reportlist = new HashMap<String,Report>();
 	public LinkedList<Order> orderlist = new LinkedList<Order>();
-   
-	Serve serve=new Serve();
-	public Waiter waiter1=new Waiter("Waiter Sam",serve);
-    public Waiter waiter2=new Waiter("Waiter John",serve);
-    
-    public Thread t1=new Thread(waiter1,"Waiter Sam");
-    public Thread t2=new Thread(waiter2,"Waiter John");
-    
-    public Cook cook1=new Cook("Cook Bob",serve);
-    public Cook cook2=new Cook("Cook Ram",serve);
-    public Cook cook3=new Cook("Cook Mira",serve);
-    
-    public Thread t3=new Thread(cook1,"Cook Bob");
-    public Thread t4=new Thread(cook2,"Cook Ram");
-    public Thread t5=new Thread(cook3,"Cook Mira");
 	
+	public static boolean online = false;
+	public static int prep_time = 0;
+	public static int order_time = 0;
+	public static HashMap<String,Cook> cookList= new HashMap<String,Cook>();
+	public static HashMap<String,Waiter> waiterList= new HashMap<String,Waiter>();
+	
+	private ArrayList<Observer> waiterObservers=new ArrayList<>();
+	private ArrayList<Observer> cookObservers=new ArrayList<>();
+	
+	public ArrayList<Observer> getWaiterObservers() {
+		return waiterObservers;
+	}
+
+	public ArrayList<Observer> getCookObservers() {
+		return cookObservers;
+	}
+
+   	
 	//This method will return the LinkedList of Orders
 	public LinkedList<Order> getOrderList(){
 		return orderlist;
@@ -74,12 +81,6 @@ public class ProcessClass {
 					String id = parts[4];
 					int milliSec = Integer.parseInt(parts[5]);
 					try {
-						String pattern = "BIT|HOT|SHK|CCD\\d{3}";
-						Pattern pat = Pattern.compile(pattern);
-						Matcher m = pat.matcher(id);
-						if(!m.find()){
-							throw new PatternException("Incorrect Id: " + id +" in Items.csv. The item Id should have the following pattern:<BIT/HOT/SHK/CCD><3-digit number> eg:BIT123, HOT123, SHK123, CCD123");
-						}
 						Item item = new Item(name,desc,price,category,id,milliSec);
 						itemlist.put(id, item);
 					}
@@ -125,24 +126,24 @@ public class ProcessClass {
 			while(scan.hasNextLine()) {
 				text=scan.nextLine();
 				try {
-						//splitting each line of the file to store in different variables
-						String[] parts = text.split(",");
-						String time = parts[0];
-						SimpleDateFormat format = new SimpleDateFormat("dd/MM/YYYY hh:mm");
-						Date date = format.parse(time);
-						Timestamp ts = new Timestamp(date.getTime());
-						String id = parts[1];
-						String itemid = parts[2];
-						int quantity = Integer.parseInt(parts[3]);
-						double amount = Double.parseDouble(parts[4]);
-						try {
-						Order order = new Order(ts,id,itemid,quantity,amount);
-						orderlist.add(order);
-						Serve.currentQueueOrder.add(order);
-						if(!Serve.serveQueue.containsKey(id))
-						{
-							Serve.serveQueue.put(id, "New");
-						}
+					//splitting each line of the file to store in different variables
+					String[] parts = text.split(",");
+					String time = parts[0];
+					SimpleDateFormat format = new SimpleDateFormat("dd/MM/YYYY hh:mm");
+					Date date = format.parse(time);
+					Timestamp ts = new Timestamp(date.getTime());
+					String id = parts[1];
+					String itemid = parts[2];
+					int quantity = Integer.parseInt(parts[3]);
+					double amount = Double.parseDouble(parts[4]);
+					try {
+					Order order = new Order(ts,id,itemid,quantity,amount);
+					orderlist.add(order);
+					Serve.currentQueueOrder.add(order);
+					if(!Serve.serveQueue.containsKey(id))
+					{
+						Serve.serveQueue.put(id,"New");
+					}
 					}
 					catch(PatternException pe) {
 					   JOptionPane.showMessageDialog(null, pe.getMessage());
@@ -171,25 +172,37 @@ public class ProcessClass {
 	//This method appends new orders with existing orders
 	public void addOrder(LinkedList<Order> list) {
 		orderlist.addAll(list);
-		Serve.currentQueueOrder.addAll(list);
+		
 		try
 		{
+			if(online) {
+				Serve.onlineQueueOrder.addAll(list);
+			}
+			else {
+				Serve.currentQueueOrder.addAll(list);
+			}
 			if(!Serve.serveQueue.containsKey(list.get(0).getCustId()))
 			{
-			Serve.serveQueue.put(list.get(0).getCustId(), "New");
+				if(online) {
+					Serve.serveQueue.put(list.get(0).getCustId(),"Online");
+				}
+				else {
+					Serve.serveQueue.put(list.get(0).getCustId(),"New");
+				}				
 			}
 		}
-		catch(Exception e){}
-		
+		catch(Exception e) {}		
 	}
 	
 	public void startService()
 	{
-	    try{t1.start();}catch(IllegalThreadStateException e){}
-		try{t2.start();}catch(IllegalThreadStateException e){}
-		try{t3.start();}catch(IllegalThreadStateException e){}
-		try{t4.start();}catch(IllegalThreadStateException e){}
-		try{t5.start();}catch(IllegalThreadStateException e){}
+		Serve serve=new Serve();
+		waiterList.put("Waiter Sam", new Waiter("Waiter Sam",serve));
+		waiterList.put("Waiter John", new Waiter("Waiter John",serve));
+		
+		cookList.put("Cook Bob", new Cook("Cook Bob",serve));
+		cookList.put("Cook Ram", new Cook("Cook Ram",serve));
+		cookList.put("Cook Mira", new Cook("Cook Mira",serve));
 	}
 		
 	
@@ -290,5 +303,42 @@ public class ProcessClass {
 		}
 		
 	}
+	public void removeCook(String cookName)
+	{
+		  try
+		  {
+    		ProcessClass.cookList.get(cookName).setExit(true);
+    		ProcessClass.cookList.remove(cookName);
+		  }catch(Exception e) {
+		  }
+	}
+	
+	public void removeWaiter(String waiterName)
+	{
+		try
+        {
+    		ProcessClass.waiterList.get(waiterName).setExit(true);
+    		ProcessClass.waiterList.remove(waiterName);
+        }catch(Exception e) {}
+	}
+	
+	public void Attach(Observer o)
+	{
+		getCookObservers().add(o);
+	}
+	
+	public void Detach(Observer o)
+	{
+		getCookObservers().remove(o);
+	}
+	
+	public void Notify()
+	{
+		for(Observer o: getCookObservers())
+		{
+			o.update(this);
+		}
+	}
+	
 
 }
