@@ -5,6 +5,11 @@
  */
 package coffeeshopapp;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
+import sun.invoke.empty.Empty;
+
 /**
  *
  * @author Nishna2
@@ -24,7 +29,10 @@ public class Cook_Subpanel extends javax.swing.JPanel {
         this.revalidate();
         this.setName(name);
         
-        System.out.println("In Cook Subpanel "+  +this.getComponentCount()+ this.getName());
+        //System.out.println("In Cook Subpanel "+  +this.getComponentCount()+ this.getName());
+        //-------------------------------------------------------------------------------------
+        display_cooking_status();
+        //-------------------------------------------------------------------------------------
     }
 
     
@@ -39,47 +47,60 @@ public class Cook_Subpanel extends javax.swing.JPanel {
     private void initComponents() {
 
         jLabel_cookname = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jList_cooking_status = new javax.swing.JList<>();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTextArea1 = new javax.swing.JTextArea();
 
         setBackground(new java.awt.Color(255, 255, 255));
 
         jLabel_cookname.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel_cookname.setText("Cook <1>");
 
-        jList_cooking_status.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
-        jScrollPane1.setViewportView(jList_cooking_status);
+        jTextArea1.setColumns(20);
+        jTextArea1.setEditable(false);
+        jTextArea1.setRows(5);
+        jScrollPane2.setViewportView(jTextArea1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jLabel_cookname)
-                .addGap(0, 344, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1)
-                .addContainerGap())
+            .addComponent(jLabel_cookname)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 310, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jLabel_cookname)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(22, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    public void display_cooking_status() {
+        //Function that updates date and time
+        Thread thread_datetime = new Thread(){
+            public void run(){
+                for(;;){
+                    String new_data = Serve.serveQueue.toString() ;
 
+                    String old_data = jTextArea1.getText();
+                    jTextArea1.setText(new_data + "\n" + old_data);
+                    try{
+                        sleep(2000);
+                    }
+                    catch(InterruptedException ex){
+                        System.out.println(ex.getStackTrace());
+                    }
+                }
+            }
+        };
+        thread_datetime.start();
+        
+        
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel_cookname;
-    private javax.swing.JList<String> jList_cooking_status;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTextArea jTextArea1;
     // End of variables declaration//GEN-END:variables
 }
