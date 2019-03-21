@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.table.DefaultTableModel;
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  *
@@ -25,6 +26,7 @@ public class Gui_2 extends javax.swing.JFrame {
     DefaultTableModel model_order,model_waiter,model_cook;
     public Gui_2() {
         initComponents();
+        DateTime();
         model_order = (DefaultTableModel)jTable_order_status.getModel();
         
         /* Loading Waiter Processing Information */
@@ -460,7 +462,35 @@ public class Gui_2 extends javax.swing.JFrame {
         jTextField_add_waiter.setText(null);
         
     }//GEN-LAST:event_jButton_add_waiterActionPerformed
-
+    
+    public void DateTime() {
+        //Function that updates date and time
+        Thread thread_datetime = new Thread(){
+            public void run(){
+                for(;;){
+                    Calendar calendar = new GregorianCalendar();
+                    int mm = calendar.get(Calendar.MONTH);
+                    int yy = calendar.get(Calendar.YEAR);
+                    int dd = calendar.get(Calendar.DAY_OF_MONTH);
+                    int ss = calendar.get(Calendar.SECOND);
+                    int min = calendar.get(Calendar.MINUTE);
+                    int hh = calendar.get(Calendar.HOUR);
+                    jLabel_datetime.setText("Date :  " + dd + "/ " + (mm + 1) + "/ " + yy +
+                            "    " + hh + ":" + min + ":" + ss + "\n");
+                    
+                    try{
+                        sleep(1000);
+                    }
+                    catch(InterruptedException ex){
+                        System.out.println(ex.getStackTrace());
+                    }
+                }
+            }
+        };
+        thread_datetime.start();
+    }
+    
+    
     /**
      * @param args the command line arguments
      */
@@ -495,6 +525,7 @@ public class Gui_2 extends javax.swing.JFrame {
             }
         });
     }
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton_add_cook;
